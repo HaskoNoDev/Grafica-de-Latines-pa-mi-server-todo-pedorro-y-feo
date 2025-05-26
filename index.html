@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Latines Live Chart</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #111;
+      color: #eee;
+      text-align: center;
+      padding: 30px;
+    }
+    canvas {
+      background-color: #222;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Latines to Euro - Real Time</h1>
+  <canvas id="latinesChart" width="800" height="400"></canvas>
+
+  <script>
+    const ctx = document.getElementById('latinesChart').getContext('2d');
+
+    const latinesData = {
+      labels: [],
+      datasets: [{
+        label: '1 Latín (€)',
+        data: [],
+        borderColor: 'rgba(75, 192, 192, 1)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        tension: 0.3
+      }]
+    };
+
+    const config = {
+      type: 'line',
+      data: latinesData,
+      options: {
+        responsive: true,
+        animation: false,
+        scales: {
+          y: {
+            min: 0.5,
+            title: { display: true, text: '€ Euros' }
+          },
+          x: {
+            title: { display: true, text: 'Hora' }
+          }
+        }
+      }
+    };
+
+    const latinesChart = new Chart(ctx, config);
+
+    // Función para generar precio aleatorio >= 0.5
+    function generarPrecioLatines() {
+      return (Math.random() * 2 + 0.5).toFixed(2); // Rango: 0.5 a 2.5 euros
+    }
+
+    function actualizarGrafica() {
+      const now = new Date();
+      const hora = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const nuevoPrecio = generarPrecioLatines();
+
+      latinesData.labels.push(hora);
+      latinesData.datasets[0].data.push(nuevoPrecio);
+
+      // Limitar a las últimas 30 entradas
+      if (latinesData.labels.length > 30) {
+        latinesData.labels.shift();
+        latinesData.datasets[0].data.shift();
+      }
+
+      latinesChart.update();
+    }
+
+    // Inicial
+    actualizarGrafica();
+
+    // Actualizar cada 60 segundos (60000 ms)
+    setInterval(actualizarGrafica, 60000);
+  </script>
+</body>
+</html>
